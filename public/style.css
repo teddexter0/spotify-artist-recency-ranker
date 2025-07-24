@@ -1,0 +1,260 @@
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f4f7f6;
+    color: #333;
+    margin: 0;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100vh;
+}
+
+.container {
+    background-color: #ffffff;
+    padding: 30px 40px;
+    border-radius: 12px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 800px;
+    text-align: center;
+}
+
+h1 {
+    color: #2c3e50;
+    margin-bottom: 15px;
+    font-size: 2.2em;
+}
+
+p {
+    line-height: 1.6;
+    margin-bottom: 20px;
+}
+
+.loading-message {
+    font-size: 1.1em;
+    color: #555;
+    margin-top: 20px;
+}
+
+.ranking-list {
+    margin-top: 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.artist-item {
+    display: flex;
+    align-items: center;
+    background-color: #ecf0f1;
+    border-radius: 8px;
+    padding: 10px 15px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    transition: transform 0.2s ease;
+}
+
+.artist-item:hover {
+    transform: translateY(-3px);
+}
+
+.artist-rank {
+    font-size: 1.2em;
+    font-weight: bold;
+    margin-right: 15px;
+    color: #3498db;
+    min-width: 30px; /* Ensure consistent spacing */
+    text-align: right;
+}
+
+.artist-image {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%; /* Make it circular */
+    object-fit: cover;
+    margin-right: 15px;
+    border: 2px solid #ccc;
+}
+
+.artist-info {
+    flex-grow: 1;
+    text-align: left;
+}
+
+.artist-name {
+    font-size: 1.3em;
+    font-weight: bold;
+    color: #2c3e50;
+}
+
+.artist-followers {
+    font-size: 0.9em;
+    color: #7f8c8d;
+}
+
+/* Highlight for the top artist */
+.top-artist {
+    background-color: #fff9e6; /* Lighter yellow */
+    border: 2px solid #f39c12; /* Orange border */
+    transform: scale(1.02);
+}
+
+.top-artist .artist-name {
+    color: #e67e22; /* Darker orange */
+    font-size: 1.5em; /* Bigger writing */
+}
+
+.top-artist .artist-rank {
+    color: #d35400; /* Even darker orange */
+    font-size: 1.4em;
+}
+
+.top-artist .artist-image {
+    border-color: #e67e22;
+}
+
+.error-message {
+    color: #c0392b;
+    background-color: #ffe6e6;
+    padding: 15px;
+    border-radius: 8px;
+    margin-top: 20px;
+    text-align: center;
+    font-weight: bold;
+}
+
+/* Basic spinner CSS */
+.spinner {
+    display: inline-block;
+    width: 1.2em;
+    height: 1.2em;
+    border: 2px solid rgba(0,0,0,.1);
+    border-radius: 50%;
+    border-top-color: #3498db; /* Your theme color */
+    animation: spin 1s ease-in-out infinite;
+    margin-left: 8px;
+    vertical-align: middle;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* ... (existing styles) */
+
+/* NEW styles for search section */
+.search-section {
+    margin-bottom: 25px;
+    padding: 20px;
+    background-color: #282828;
+    border-radius: 8px;
+    display: flex;
+    flex-wrap: wrap; /* Allows input and button to wrap on smaller screens */
+    gap: 10px;
+    align-items: center;
+}
+
+.search-section input[type="text"] {
+    flex-grow: 1; /* Allows input to take available space */
+    padding: 10px 15px;
+    border: 1px solid #4a4a4a;
+    border-radius: 5px;
+    background-color: #333;
+    color: #fff;
+    font-size: 1em;
+}
+
+.search-section button {
+    padding: 10px 20px;
+    background-color: #1DB954; /* Spotify Green */
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1em;
+    font-weight: bold;
+    transition: background-color 0.2s ease;
+}
+
+.search-section button:hover {
+    background-color: #1ed760;
+}
+
+.search-results-display {
+    width: 100%; /* Takes full width below input/button */
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid #4a4a4a;
+}
+
+.search-results-display .message {
+    text-align: center;
+    color: #bbb;
+    font-style: italic;
+}
+
+.search-results-display .error-message {
+    color: #ff6b6b;
+    font-weight: bold;
+}
+
+/* Style for the single artist result card */
+.searched-artist {
+    display: flex;
+    align-items: center;
+    background-color: #333;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 15px; /* Add some space below if multiple searches */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.searched-artist .artist-image {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-right: 15px;
+}
+
+.searched-artist .artist-info h3 {
+    margin-top: 0;
+    margin-bottom: 5px;
+    color: #1DB954;
+}
+
+.searched-artist .artist-info p {
+    margin: 3px 0;
+    font-size: 0.9em;
+    color: #bbb;
+}
+
+.searched-artist .rank-badge {
+    display: inline-block;
+    background-color: #1DB954;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.8em;
+    font-weight: bold;
+    margin-top: 5px;
+}
+
+.searched-artist .not-ranked {
+    display: inline-block;
+    background-color: #555;
+    color: #eee;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.8em;
+    font-weight: bold;
+    margin-top: 5px;
+}
+
+/* Optional: Highlight an artist in the main list if they are also searched */
+.artist-item.highlight-searched {
+    border: 2px solid #1DB954; /* Green border */
+    box-shadow: 0 0 15px rgba(29, 185, 84, 0.6); /* Green glow */
+    transform: scale(1.02); /* Slightly larger */
+    transition: all 0.3s ease-in-out;
+}

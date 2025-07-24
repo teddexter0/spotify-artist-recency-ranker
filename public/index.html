@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spotify Artists Popularity Ranking</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Spotify Popular Artists Ranking</h1>
+
+        <div class="search-section">
+            <input type="text" id="artist-search-input" placeholder="Search for an artist..." autocomplete="off">
+            <button id="search-button">Search</button>
+            <div id="search-results-display" class="search-results-display">
+                </div>
+        </div>
+
+        <div id="loading-message" class="loading-message">
+            Loading top artists... <span class="spinner"></span>
+        </div>
+        <div id="artist-list" class="artist-list">
+            </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
