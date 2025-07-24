@@ -164,8 +164,12 @@ app.get('/api/search-artist', async (req, res) => {
     }
 });
 
-// ---- Start Server ----
-
-app.listen(PORT, () => {
+// ✅ Local dev: only run if this file is run directly
+if (process.env.VERCEL !== '1') {
+  app.listen(PORT, () => {
     console.log(`✅ Local server running at: http://localhost:${PORT}`);
-});
+  });
+}
+
+// ✅ Vercel: export for serverless usage
+export default app;
