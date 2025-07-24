@@ -3,8 +3,7 @@
 > A modern web application that dynamically ranks popular artists using Spotify's Web API with stunning visual effects and real-time search.
 
 ### 🔗 Live Demo
-
-[https://spotify-artist-recency-ranker.vercel.app/](https://spotify-artist-recency-ranker.vercel.app/)
+[https://spotify-artist-recency-ranker-app.vercel.app/](https://spotify-artist-recency-ranker-app.vercel.app/)
 
 ## 📸 Screenshots
 
