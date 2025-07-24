@@ -1,212 +1,171 @@
-import dotenv from 'dotenv';
 import express from 'express';
-import axios from 'axios';
-import cors from 'cors';
 import path from 'path';
+import cors from 'cors';
+import dotenv from 'dotenv';
+import axios from 'axios';
 import { fileURLToPath } from 'url';
 
-// Setup __dirname for ES modules
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-dotenv.config({ path: path.resolve(__dirname, '../.env') }); // Ensure dotenv loads from the correct path
+dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-app.use(cors()); // Enable CORS for all routes
-app.use(express.static('public')); // Serve static files from the 'public' directory
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
+// Middleware
+app.use(cors());
+app.use(express.static(path.join(__dirname, '../public')));
+
+// ---- Spotify Token Handling ----
 let spotifyAccessToken = null;
 let tokenExpiryTime = 0;
-const TOKEN_REFRESH_THRESHOLD = 60 * 5; // Refresh token 5 minutes before it expires
+const TOKEN_REFRESH_THRESHOLD = 60 * 5;
 
-// Define broad search queries to get a diverse set of artists
-const SEARCH_QUERIES = [
-    'a', 'e', 'i', 'o', 'u', // Vowels often appear in popular names
-    'the', 'pop', 'rock', 'hip hop', 'r&b', 'dance', 'country', 'jazz', // Genres
-    'band', 'singer', 'group', // Common terms
-    'star', 'legend', // More descriptive terms
-    'love', 'world', // Common words in song/artist names
-];
-const SEARCH_LIMIT_PER_QUERY = 50; // Max results per search request
-const SEARCH_OFFSETS_PER_QUERY = [0, 50, 100, 150, 200]; // Fetch up to 5 pages per query (50*5 = 250 artists per query)
-const RANKING_SIZE = 100; // The desired number of top artists to return
-
-// Cache for ranking data
-let cachedRanking = null;
-let lastCacheTime = 0;
-const CACHE_LIFETIME = 1000 * 60 * 60; // Cache for 1 hour (in milliseconds)
-
-/**
- * Function to get a Spotify access token using Client Credentials Flow.
- * Caches the token and refreshes it if expired.
- */
 async function getSpotifyAccessToken() {
     const now = Date.now();
-    if (spotifyAccessToken && (now < tokenExpiryTime - TOKEN_REFRESH_THRESHOLD * 1000)) {
-        // Token is still valid, no need to refresh
+
+    if (spotifyAccessToken && now < tokenExpiryTime - TOKEN_REFRESH_THRESHOLD * 1000) {
         return spotifyAccessToken;
     }
 
     const clientId = process.env.SPOTIFY_CLIENT_ID;
     const clientSecret = process.env.SPOTIFY_CLIENT_SECRET;
 
-    if (!clientId || !clientSecret) {
-        console.error("SPOTIFY_CLIENT_ID or SPOTIFY_CLIENT_SECRET not set in .env file.");
-        throw new Error("Spotify credentials not configured.");
-    }
+    if (!clientId || !clientSecret) throw new Error('Spotify credentials missing');
 
     const authHeader = Buffer.from(`${clientId}:${clientSecret}`).toString('base64');
 
-    try {
-        const response = await axios.post('https://accounts.spotify.com/api/token', 'grant_type=client_credentials', {
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-                'Authorization': `Basic ${authHeader}`
-            }
-        });
+    const res = await axios.post('https://accounts.spotify.com/api/token', 'grant_type=client_credentials', {
+        headers: {
+            Authorization: `Basic ${authHeader}`,
+            'Content-Type': 'application/x-www-form-urlencoded'
+        }
+    });
 
-        spotifyAccessToken = response.data.access_token;
-        tokenExpiryTime = now + response.data.expires_in * 1000; // expires_in is in seconds
-        console.log('Spotify access token obtained.');
-        return spotifyAccessToken;
-    } catch (error) {
-        console.error('Error obtaining Spotify access token:', error.response ? error.response.data : error.message);
-        throw new Error('Failed to obtain Spotify access token.');
-    }
+    spotifyAccessToken = res.data.access_token;
+    tokenExpiryTime = now + res.data.expires_in * 1000;
+
+    return spotifyAccessToken;
 }
 
-/**
- * Fetches artists based on multiple search queries, de-duplicates, and ranks them by popularity.
- */
-async function getRankedArtists() {
-    const accessToken = await getSpotifyAccessToken();
-    const headers = {
-        'Authorization': `Bearer ${accessToken}`
-    };
+// ---- Dynamic Artist Ranking ----
+const SEARCH_QUERIES = [
+    'a', 'e', 'i', 'o', 'u',
+    'pop', 'rock', 'hip hop', 'trap', 'reggae',
+    'dance', 'country', 'band', 'legend', 'star'
+];
+const SEARCH_LIMIT = 50;
+const SEARCH_OFFSETS = [0, 50, 100];
+const RANKING_SIZE = 100;
 
-    const allArtistsMap = new Map(); // Use a Map to store unique artists by ID
+let cachedRanking = null;
+let lastCacheTime = 0;
+const CACHE_LIFETIME = 1000 * 60 * 60;
 
+async function getArtistsRanking() {
+    const now = Date.now();
+    if (cachedRanking && now < lastCacheTime + CACHE_LIFETIME) {
+        return cachedRanking;
+    }
+
+    const token = await getSpotifyAccessToken();
+    const headers = { Authorization: `Bearer ${token}` };
+    const allArtistsMap = new Map();
     const searchPromises = [];
 
     for (const query of SEARCH_QUERIES) {
-        for (const offset of SEARCH_OFFSETS_PER_QUERY) {
-            const searchUrl = `https://api.spotify.com/v1/search?q=${encodeURIComponent(query)}&type=artist&limit=${SEARCH_LIMIT_PER_QUERY}&offset=${offset}`;
+        for (const offset of SEARCH_OFFSETS) {
+            const url = `https://api.spotify.com/v1/search?q=${encodeURIComponent(query)}&type=artist&limit=${SEARCH_LIMIT}&offset=${offset}`;
             searchPromises.push(
-                axios.get(searchUrl, { headers })
-                    .then(response => response.data.artists.items)
-                    .catch(error => {
-                        console.error(`Error fetching artists for query "${query}" (offset ${offset}):`, error.response ? error.response.status : error.message);
-                        return []; // Return empty array on error to avoid breaking Promise.all
-                    })
+                axios.get(url, { headers })
+                    .then(res => res.data.artists.items || [])
+                    .catch(() => [])
             );
         }
     }
 
-    try {
-        // Wait for all search promises to resolve
-        const results = await Promise.all(searchPromises);
+    const results = await Promise.all(searchPromises);
 
-        // Process results to aggregate and de-duplicate artists
-        for (const artistsPage of results) {
-            for (const artist of artistsPage) {
-                // Ensure the artist has an ID, name, followers, and images
-                if (artist.id && artist.name && artist.images && artist.images.length > 0 && artist.followers && typeof artist.popularity === 'number') {
-                    // Find 64x64 image, else smallest, else largest
-                    let chosenImage = artist.images.find(img => img.width === 64) || artist.images[artist.images.length - 1] || artist.images[0];
-                    allArtistsMap.set(artist.id, {
-                        id: artist.id,
-                        name: artist.name,
-                        followers: artist.followers.total,
-                        popularity: artist.popularity,
-                        imageUrl: artist.images.length > 0 ? (chosenImage.url) : 'https://via.placeholder.com/150?text=No+Image'
-                    });
-                }
+    for (const group of results) {
+        for (const artist of group) {
+            if (
+                artist?.id &&
+                artist?.name &&
+                artist?.followers?.total &&
+                typeof artist.popularity === 'number' &&
+                artist?.images?.[0]?.url
+            ) {
+                allArtistsMap.set(artist.id, {
+                    id: artist.id,
+                    name: artist.name,
+                    followers: artist.followers.total,
+                    popularity: artist.popularity,
+                    imageUrl: artist.images[0].url
+                });
             }
         }
-
-        // Convert Map values back to an array
-        const allUniqueArtists = Array.from(allArtistsMap.values());
-
-        // Sort by popularity in descending order
-        allUniqueArtists.sort((a, b) => b.popularity - a.popularity);
-
-        // Take the top N artists
-        return allUniqueArtists.slice(0, RANKING_SIZE);
-
-    } catch (error) {
-        console.error('Error during artist search and aggregation:', error.message);
-        throw new Error('Failed to get ranked artists.');
     }
+
+    const uniqueArtists = Array.from(allArtistsMap.values());
+    uniqueArtists.sort((a, b) => b.popularity - a.popularity);
+
+    cachedRanking = uniqueArtists.slice(0, RANKING_SIZE);
+    lastCacheTime = Date.now();
+    return cachedRanking;
 }
 
-// Add this new endpoint to your server/index.js
-app.get('/api/search-artist', async (req, res) => {
-    const artistName = req.query.name; // Get artist name from query parameter
-    if (!artistName) {
-        return res.status(400).json({ error: 'Artist name query parameter "name" is required.' });
-    }
+// ---- Routes ----
 
-    try {
-        const accessToken = await getSpotifyAccessToken();
-        const headers = {
-            'Authorization': `Bearer ${accessToken}`
-        };
-
-        // Search for the artist, limit to 1 result for the most relevant match
-        const searchUrl = `https://api.spotify.com/v1/search?q=${encodeURIComponent(artistName)}&type=artist&limit=1`;
-
-        const response = await axios.get(searchUrl, { headers });
-        const artist = response.data.artists.items[0]; // Get the first (most relevant) artist found
-
-        if (artist) {
-            // Check if this artist is in our currently cached top 100 ranking
-            const rankInTop100 = cachedRanking ? cachedRanking.findIndex(a => a.id === artist.id) + 1 : -1;
-
-            res.json({
-                id: artist.id,
-                name: artist.name,
-                followers: artist.followers.total,
-                popularity: artist.popularity,
-                imageUrl: artist.images.length > 0 ?
-                          (artist.images.find(img => img.width === 64) || artist.images[artist.images.length - 1] || artist.images[0]).url :
-                          'https://via.placeholder.com/150?text=No+Image',
-                rankInTop100: rankInTop100 !== 0 ? rankInTop100 : -1 // -1 if not found or is 0-indexed result
-            });
-        } else {
-            res.status(404).json({ message: `Artist "${artistName}" not found.` });
-        }
-
-    } catch (error) {
-        console.error(`Error searching for artist "${artistName}":`, error.response ? error.response.data : error.message);
-        res.status(500).json({ error: 'Failed to search for artist.' });
-    }
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, '../public/index.html'));
 });
 
-// API endpoint for artist ranking
 app.get('/api/artists-ranking', async (req, res) => {
-    const now = Date.now();
-
-    // Check if cached data is still valid
-    if (cachedRanking && (now < lastCacheTime + CACHE_LIFETIME)) {
-        console.log('Serving artists ranking from cache.');
-        return res.json(cachedRanking);
-    }
-
-    // Fetch new data if cache is expired or empty
     try {
-        console.log('Fetching fresh artists ranking...');
-        const rankedArtists = await getRankedArtists();
-        cachedRanking = rankedArtists;
-        lastCacheTime = now;
-        res.json(rankedArtists);
-    } catch (error) {
-        console.error('Error in /api/artists-ranking:', error.message);
-        res.status(500).json({ error: 'Failed to retrieve artist ranking.' });
+        const artists = await getArtistsRanking();
+        res.json(artists);
+    } catch (err) {
+        console.error('❌ Backend Error (ranking):', err.message);
+        res.status(500).json({ error: 'Something went wrong.' });
     }
 });
+
+app.get('/api/search-artist', async (req, res) => {
+    const name = req.query.name;
+    if (!name) return res.status(400).json({ error: 'No artist name provided' });
+
+    try {
+        const token = await getSpotifyAccessToken();
+
+        const searchRes = await fetch(`https://api.spotify.com/v1/search?q=${encodeURIComponent(name)}&type=artist&limit=1`, {
+            headers: { Authorization: `Bearer ${token}` }
+        });
+
+        const json = await searchRes.json();
+        const artist = json.artists?.items?.[0];
+
+        if (!artist) return res.status(404).json({ message: 'Artist not found' });
+
+        const topArtists = await getArtistsRanking();
+        const rank = topArtists.findIndex(a => a.id === artist.id) + 1;
+
+        res.json({
+            id: artist.id,
+            name: artist.name,
+            popularity: artist.popularity ?? 0,
+            followers: artist.followers?.total ?? 0,
+            imageUrl: artist.images?.[0]?.url || 'https://via.placeholder.com/150',
+            rankInTop100: rank > 0 ? rank : -1
+        });
+    } catch (err) {
+        console.error('❌ Search API Error:', err);
+        res.status(500).json({ error: 'Search failed' });
+    }
+});
+
+// ---- Start Server ----
 
 app.listen(PORT, () => {
-    console.log(`Server running on http://localhost:${PORT}`);
+    console.log(`✅ Local server running at: http://localhost:${PORT}`);
 });

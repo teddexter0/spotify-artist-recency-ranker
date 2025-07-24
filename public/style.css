@@ -1,4 +1,9 @@
-/* Enhanced Flashy Spotify App CSS - CORRECTED FOR VISIBILITY */
+.artist-item.rendered {
+    opacity: 1 !important;
+    transform: translateX(0) !important;
+}
+
+/* Enhanced Flashy Spotify App CSS - CORRECTED FOR VISIBILITY (Black & White H1) */
 
 :root {
     --primary-color: #1DB954; /* Spotify Green */
@@ -13,14 +18,20 @@
     --text-muted: #6a6a6a; /* Muted grey text */
 
     /* ***** NEW / ADJUSTED COLORS FOR BETTER CONTRAST & VISIBILITY ***** */
-    --h1-text-color: #CCFF00; /* MUCH BRIGHTER, ALMOST NEON GREEN for H1 */
-    --h1-shadow-color: rgba(0, 0, 0, 0.9); /* Darker, more pronounced shadow for H1 */
-    --artist-item-bg-initial: rgba(26, 26, 26, 0.9); /* Initial artist background, slightly less transparent */
-    --artist-item-text: #E0E0E0; /* Lighter text for non-hovered artists */
-    --artist-item-hover-bg: linear-gradient(135deg, rgba(29, 185, 84, 0.4) 0%, rgba(30, 30, 30, 0.98) 100%); /* Stronger hover background with more green */
-    --artist-item-hover-text: #FFFFFF; /* Ensures text is white on hover */
+    /* H1 Black & White Scheme */
+    --h1-text-color: #FFFFFF; /* Pure white for H1 text */
+    --h1-shadow-color: rgba(0, 0, 0, 0.9); /* Strong black shadow for H1 */
+
+    /* Artist Item Visibility Enhancements */
+    --artist-item-bg-initial: rgba(26, 26, 26, 0.95); /* Even less transparent for better base contrast */
+    --artist-item-text: #E8E8E8; /* Very light grey for non-hovered artist names */
+    --artist-item-info-text: #B0B0B0; /* Slightly darker grey for non-hovered info text */
+    --artist-item-hover-bg: linear-gradient(135deg, rgba(29, 185, 84, 0.5) 0%, rgba(30, 30, 30, 0.98) 100%); /* Stronger green presence on hover */
+    --artist-item-hover-text: #FFFFFF; /* Ensures text is pure white on hover */
+
     --searched-artist-bg: linear-gradient(135deg, rgba(60, 60, 60, 0.98) 0%, rgba(40, 40, 40, 0.98) 100%); /* Clearly distinct search result background */
     --search-input-focus-shadow-color: rgba(29, 185, 84, 0.8); /* Stronger shadow on search input focus */
+
 
     --gradient-primary: linear-gradient(135deg, #1DB954 0%, #1ed760 100%);
     --gradient-accent: linear-gradient(135deg, #FF6B35 0%, #FFB366 100%);
@@ -52,9 +63,9 @@ body::before {
     width: 100%;
     height: 100%;
     background: 
-        radial-gradient(circle at 20% 80%, rgba(29, 185, 84, 0.25) 0%, transparent 60%), /* Increased opacity, wider spread */
-        radial-gradient(circle at 80% 20%, rgba(255, 107, 53, 0.25) 0%, transparent 60%), /* Increased opacity, wider spread */
-        radial-gradient(circle at 40% 40%, rgba(29, 185, 84, 0.15) 0%, transparent 70%); /* Increased opacity, wider spread */
+        radial-gradient(circle at 20% 80%, rgba(29, 185, 84, 0.25) 0%, transparent 60%),
+        radial-gradient(circle at 80% 20%, rgba(255, 107, 53, 0.25) 0%, transparent 60%),
+        radial-gradient(circle at 40% 40%, rgba(29, 185, 84, 0.15) 0%, transparent 70%);
     z-index: -2;
     animation: backgroundShift 20s ease-in-out infinite alternate;
 }
@@ -73,10 +84,10 @@ body::after {
     width: 100%;
     height: 100%;
     background-image: 
-        radial-gradient(2px 2px at 20px 30px, rgba(29, 185, 84, 0.6), transparent), /* More visible */
-        radial-gradient(2px 2px at 40px 70px, rgba(255, 107, 53, 0.6), transparent), /* More visible */
-        radial-gradient(1px 1px at 90px 40px, rgba(29, 185, 84, 0.7), transparent), /* More visible */
-        radial-gradient(1px 1px at 130px 80px, rgba(255, 107, 53, 0.7), transparent); /* More visible */
+        radial-gradient(2px 2px at 20px 30px, rgba(29, 185, 84, 0.6), transparent),
+        radial-gradient(2px 2px at 40px 70px, rgba(255, 107, 53, 0.6), transparent),
+        radial-gradient(1px 1px at 90px 40px, rgba(29, 185, 84, 0.7), transparent),
+        radial-gradient(1px 1px at 130px 80px, rgba(255, 107, 53, 0.7), transparent);
     background-repeat: repeat;
     background-size: 150px 100px;
     z-index: -1;
@@ -89,7 +100,7 @@ body::after {
 }
 
 .container {
-    background: rgba(26, 26, 26, 0.98); /* Less transparent to minimize background bleed */
+    background: rgba(26, 26, 26, 0.98);
     backdrop-filter: blur(20px);
     border: 1px solid rgba(29, 185, 84, 0.2);
     margin: 20px auto;
@@ -121,7 +132,7 @@ body::after {
     border-radius: 26px;
     z-index: -1;
     animation: borderGlow 3s ease-in-out infinite alternate;
-    opacity: 0.8; /* Slightly more opaque glow */
+    opacity: 0.8;
 }
 
 @keyframes borderGlow {
@@ -130,26 +141,43 @@ body::after {
 }
 
 h1 {
-    /* ***** SIGNIFICANTLY BRIGHTER GREEN AND STRONGER SHADOW ***** */
-    color: var(--h1-text-color); /* Direct, very bright green */
-    /* Using background-clip text for a subtle textured feel, but primary color is via 'color' property */
-    background: var(--gradient-primary); 
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    /* ***** H1: PURE BLACK TEXT WITH WHITE SHADOW FOR MAX CONTRAST ***** */
+    color: var(--h1-text-color); /* Set text to pure white initially */
+    /* Remove background-clip text for H1 to show solid color */
+    background: none; /* Ensure no text-fill-color from previous gradient */
+    -webkit-text-fill-color: initial; /* Reset to default text fill */
+    
     font-size: 3.5em;
     font-weight: 900;
     text-align: center;
     margin-bottom: 30px;
-    /* Increased blur and spread for a more prominent shadow */
-    text-shadow: 0 0 40px var(--primary-color), 0 0 60px var(--h1-shadow-color); 
+    /* Strong white shadow, black background for the H1 text */
+    text-shadow: 
+        -2px -2px 0 var(--h1-shadow-color),  /* Top-left black border */
+        2px -2px 0 var(--h1-shadow-color),   /* Top-right black border */
+        -2px 2px 0 var(--h1-shadow-color),    /* Bottom-left black border */
+        2px 2px 0 var(--h1-shadow-color),     /* Bottom-right black border */
+        0 0 10px rgba(255, 255, 255, 0.7); /* Subtle white glow */
     animation: titlePulse 4s ease-in-out infinite alternate;
     position: relative;
 }
 
+/* Adjust titlePulse animation for new H1 style */
 @keyframes titlePulse {
-    0% { transform: scale(1) rotateY(0deg); text-shadow: 0 0 40px rgba(29, 185, 84, 0.6), 0 0 50px rgba(0, 0, 0, 0.5); }
-    100% { transform: scale(1.05) rotateY(2deg); text-shadow: 0 0 50px rgba(29, 185, 84, 0.9), 0 0 70px rgba(0, 0, 0, 0.8); }
+    0% { 
+        transform: scale(1) rotateY(0deg); 
+        text-shadow: 
+            -2px -2px 0 var(--h1-shadow-color), 2px -2px 0 var(--h1-shadow-color), 
+            -2px 2px 0 var(--h1-shadow-color), 2px 2px 0 var(--h1-shadow-color), 
+            0 0 10px rgba(255, 255, 255, 0.7); 
+    }
+    100% { 
+        transform: scale(1.05) rotateY(2deg); 
+        text-shadow: 
+            -3px -3px 0 var(--h1-shadow-color), 3px -3px 0 var(--h1-shadow-color), 
+            -3px 3px 0 var(--h1-shadow-color), 3px 3px 0 var(--h1-shadow-color), 
+            0 0 15px rgba(255, 255, 255, 1); /* Brighter glow on pulse */
+    }
 }
 
 /* Enhanced Search Section */
@@ -176,7 +204,7 @@ h1 {
     left: -100%;
     width: 100%;
     height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(29, 185, 84, 0.25), transparent); /* More visible sweep */
+    background: linear-gradient(90deg, transparent, rgba(29, 185, 84, 0.25), transparent);
     animation: searchSweep 3s infinite;
 }
 
@@ -200,7 +228,6 @@ h1 {
 .search-section input[type="text"]:focus {
     outline: none;
     border-color: var(--primary-color);
-    /* Stronger, more distinct shadow */
     box-shadow: 
         0 0 30px var(--search-input-focus-shadow-color), 
         inset 0 1px 0 rgba(255, 255, 255, 0.2);
@@ -252,14 +279,13 @@ h1 {
     display: flex;
     align-items: center;
     /* ***** ADJUSTED INITIAL BACKGROUND & TEXT COLOR FOR BETTER VISIBILITY ***** */
-    background: var(--artist-item-bg-initial); /* Less transparent to minimize background bleed */
+    background: var(--artist-item-bg-initial); /* Base background is very dark, less transparent */
     border: 1px solid rgba(29, 185, 84, 0.2);
     border-radius: 16px;
     padding: 20px;
     margin-bottom: 15px;
     backdrop-filter: blur(10px);
     
-    /* Consolidated Transition for smoothness */
     transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), 
                 box-shadow 0.4s ease-in-out, 
                 border-color 0.4s ease-in-out,
@@ -350,20 +376,21 @@ h1 {
 .artist-name {
     font-size: 1.4em;
     font-weight: 700;
-    /* ***** ENSURING INITIAL TEXT IS LIGHTER FOR VISIBILITY ***** */
+    /* ***** ENSURING INITIAL TEXT IS VERY LIGHT FOR VISIBILITY ***** */
     color: var(--artist-item-text); 
     margin-bottom: 8px;
     transition: color 0.3s ease, text-shadow 0.3s ease;
 }
 
 .artist-item:hover .artist-name {
-    /* ***** ENSURING HOVER TEXT IS WHITE FOR MAXIMUM CONTRAST ***** */
+    /* ***** ENSURING HOVER TEXT IS PURE WHITE FOR MAXIMUM CONTRAST ***** */
     color: var(--artist-item-hover-text); 
     text-shadow: 0 0 10px rgba(29, 185, 84, 0.5);
 }
 
 .artist-info p {
-    color: var(--text-secondary);
+    /* ***** INFO TEXT IS SLIGHTLY DARKER GREY FOR SUBTLE HIERARCHY ***** */
+    color: var(--artist-item-info-text); 
     margin: 5px 0;
     font-size: 0.95em;
     transition: color 0.3s ease, transform 0.3s ease;
@@ -414,7 +441,7 @@ h1 {
 }
 
 .searched-artist {
-    /* ***** CLEARLY DISTINCT SEARCHED ARTIST BACKGROUND ***** */
+    /* Use the new searched artist background variable */
     background: var(--searched-artist-bg);
     border: 2px solid rgba(255, 107, 53, 0.4);
     border-radius: 20px;
@@ -498,9 +525,9 @@ h1 {
 
 /* Error Messages */
 .error-message {
-    background: linear-gradient(135deg, rgba(220, 53, 69, 0.3) 0%, rgba(220, 53, 69, 0.2) 100%); /* More opaque */
-    border: 2px solid rgba(220, 53, 69, 0.7); /* Stronger border */
-    color: #ff8888; /* Lighter red for text */
+    background: linear-gradient(135deg, rgba(220, 53, 69, 0.3) 0%, rgba(220, 53, 69, 0.2) 100%);
+    border: 2px solid rgba(220, 53, 69, 0.7);
+    color: #ff8888;
     padding: 20px;
     border-radius: 15px;
     text-align: center;

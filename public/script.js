@@ -214,7 +214,8 @@ function displayArtists(artists) {
         
         // --- REMOVED: JS-based mouseenter/mouseleave hover effects ---
         // These are now handled entirely by CSS using the :hover pseudo-class
-        
+        artistItem.classList.add('rendered');
+
         fragment.appendChild(artistItem);
     });
 
