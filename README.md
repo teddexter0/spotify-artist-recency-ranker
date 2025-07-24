@@ -6,8 +6,14 @@
 
 [https://spotify-artist-recency-ranker.vercel.app/](https://spotify-artist-recency-ranker.vercel.app/)
 
+## 📸 Screenshots
 
-![App Screenshot](https://via.placeholder.com/800x400/1DB954/FFFFFF?text=Replace+with+actual+screenshot)
+### 🏠 Homepage
+<img src="./assets/betaHome.jpeg" width="800"/>
+
+### 🔍 Search: Michael Jackson
+<img src="./assets/mJSearch.jpeg" width="800"/>
+
 
 ## ✨ Features
 
