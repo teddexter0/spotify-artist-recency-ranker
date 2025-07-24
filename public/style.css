@@ -1,79 +1,345 @@
-body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #f4f7f6;
-    color: #333;
+/* Enhanced Flashy Spotify App CSS - CORRECTED FOR VISIBILITY */
+
+:root {
+    --primary-color: #1DB954; /* Spotify Green */
+    --primary-dark: #1ed760;
+    --secondary-color: #191414; /* Dark background elements */
+    --accent-color: #FF6B35; /* Vibrant Orange/Coral for accent */
+    --accent-light: #FFB366;
+    --background-dark: #121212; /* Very dark overall background */
+    --surface-color: #1a1a1a; /* Slightly lighter dark for cards/surfaces */
+    --text-primary: #ffffff; /* Main white text */
+    --text-secondary: #b3b3b3; /* Secondary grey text */
+    --text-muted: #6a6a6a; /* Muted grey text */
+
+    /* ***** NEW / ADJUSTED COLORS FOR BETTER CONTRAST & VISIBILITY ***** */
+    --h1-text-color: #CCFF00; /* MUCH BRIGHTER, ALMOST NEON GREEN for H1 */
+    --h1-shadow-color: rgba(0, 0, 0, 0.9); /* Darker, more pronounced shadow for H1 */
+    --artist-item-bg-initial: rgba(26, 26, 26, 0.9); /* Initial artist background, slightly less transparent */
+    --artist-item-text: #E0E0E0; /* Lighter text for non-hovered artists */
+    --artist-item-hover-bg: linear-gradient(135deg, rgba(29, 185, 84, 0.4) 0%, rgba(30, 30, 30, 0.98) 100%); /* Stronger hover background with more green */
+    --artist-item-hover-text: #FFFFFF; /* Ensures text is white on hover */
+    --searched-artist-bg: linear-gradient(135deg, rgba(60, 60, 60, 0.98) 0%, rgba(40, 40, 40, 0.98) 100%); /* Clearly distinct search result background */
+    --search-input-focus-shadow-color: rgba(29, 185, 84, 0.8); /* Stronger shadow on search input focus */
+
+    --gradient-primary: linear-gradient(135deg, #1DB954 0%, #1ed760 100%);
+    --gradient-accent: linear-gradient(135deg, #FF6B35 0%, #FFB366 100%);
+    --gradient-dark: linear-gradient(135deg, #191414 0%, #000000 100%);
+    --shadow-glow: 0 0 30px rgba(29, 185, 84, 0.3);
+    --shadow-accent: 0 0 20px rgba(255, 107, 53, 0.4);
+}
+
+* {
     margin: 0;
-    padding: 20px;
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
-    min-height: 100vh;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, 'Roboto', sans-serif;
+    background: var(--background-dark);
+    color: var(--text-primary);
+    overflow-x: hidden;
+    position: relative;
+}
+
+/* Animated Background */
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: 
+        radial-gradient(circle at 20% 80%, rgba(29, 185, 84, 0.25) 0%, transparent 60%), /* Increased opacity, wider spread */
+        radial-gradient(circle at 80% 20%, rgba(255, 107, 53, 0.25) 0%, transparent 60%), /* Increased opacity, wider spread */
+        radial-gradient(circle at 40% 40%, rgba(29, 185, 84, 0.15) 0%, transparent 70%); /* Increased opacity, wider spread */
+    z-index: -2;
+    animation: backgroundShift 20s ease-in-out infinite alternate;
+}
+
+@keyframes backgroundShift {
+    0% { transform: translateX(-20px) translateY(-10px); }
+    100% { transform: translateX(20px) translateY(10px); }
+}
+
+/* Floating Particles */
+body::after {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: 
+        radial-gradient(2px 2px at 20px 30px, rgba(29, 185, 84, 0.6), transparent), /* More visible */
+        radial-gradient(2px 2px at 40px 70px, rgba(255, 107, 53, 0.6), transparent), /* More visible */
+        radial-gradient(1px 1px at 90px 40px, rgba(29, 185, 84, 0.7), transparent), /* More visible */
+        radial-gradient(1px 1px at 130px 80px, rgba(255, 107, 53, 0.7), transparent); /* More visible */
+    background-repeat: repeat;
+    background-size: 150px 100px;
+    z-index: -1;
+    animation: floatingParticles 30s linear infinite;
+}
+
+@keyframes floatingParticles {
+    0% { transform: translateY(0px) rotate(0deg); }
+    100% { transform: translateY(-100px) rotate(360deg); }
 }
 
 .container {
-    background-color: #ffffff;
-    padding: 30px 40px;
-    border-radius: 12px;
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
-    width: 100%;
-    max-width: 800px;
-    text-align: center;
+    background: rgba(26, 26, 26, 0.98); /* Less transparent to minimize background bleed */
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(29, 185, 84, 0.2);
+    margin: 20px auto;
+    padding: 40px;
+    border-radius: 24px;
+    max-width: 900px;
+    box-shadow: 
+        var(--shadow-glow),
+        0 20px 40px rgba(0, 0, 0, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    position: relative;
+    animation: containerFloat 6s ease-in-out infinite alternate;
+}
+
+@keyframes containerFloat {
+    0% { transform: translateY(0px) rotateX(0deg); }
+    100% { transform: translateY(-10px) rotateX(1deg); }
+}
+
+/* Glowing border animation */
+.container::before {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    background: var(--gradient-primary);
+    border-radius: 26px;
+    z-index: -1;
+    animation: borderGlow 3s ease-in-out infinite alternate;
+    opacity: 0.8; /* Slightly more opaque glow */
+}
+
+@keyframes borderGlow {
+    0% { opacity: 0.7; filter: blur(1px); }
+    100% { opacity: 1; filter: blur(0px); }
 }
 
 h1 {
-    color: #2c3e50;
-    margin-bottom: 15px;
-    font-size: 2.2em;
+    /* ***** SIGNIFICANTLY BRIGHTER GREEN AND STRONGER SHADOW ***** */
+    color: var(--h1-text-color); /* Direct, very bright green */
+    /* Using background-clip text for a subtle textured feel, but primary color is via 'color' property */
+    background: var(--gradient-primary); 
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-size: 3.5em;
+    font-weight: 900;
+    text-align: center;
+    margin-bottom: 30px;
+    /* Increased blur and spread for a more prominent shadow */
+    text-shadow: 0 0 40px var(--primary-color), 0 0 60px var(--h1-shadow-color); 
+    animation: titlePulse 4s ease-in-out infinite alternate;
+    position: relative;
 }
 
-p {
-    line-height: 1.6;
-    margin-bottom: 20px;
+@keyframes titlePulse {
+    0% { transform: scale(1) rotateY(0deg); text-shadow: 0 0 40px rgba(29, 185, 84, 0.6), 0 0 50px rgba(0, 0, 0, 0.5); }
+    100% { transform: scale(1.05) rotateY(2deg); text-shadow: 0 0 50px rgba(29, 185, 84, 0.9), 0 0 70px rgba(0, 0, 0, 0.8); }
 }
 
-.loading-message {
+/* Enhanced Search Section */
+.search-section {
+    background: var(--gradient-dark);
+    border: 2px solid rgba(29, 185, 84, 0.3);
+    border-radius: 20px;
+    padding: 25px;
+    margin-bottom: 30px;
+    position: relative;
+    overflow: hidden;
+    animation: searchSectionFloat 8s ease-in-out infinite alternate;
+}
+
+@keyframes searchSectionFloat {
+    0% { transform: translateX(-5px) rotateZ(-0.5deg); }
+    100% { transform: translateX(5px) rotateZ(0.5deg); }
+}
+
+.search-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(29, 185, 84, 0.25), transparent); /* More visible sweep */
+    animation: searchSweep 3s infinite;
+}
+
+@keyframes searchSweep {
+    0% { left: -100%; }
+    100% { left: 100%; }
+}
+
+.search-section input[type="text"] {
+    flex-grow: 1;
+    padding: 15px 25px;
+    border: 2px solid rgba(29, 185, 84, 0.3);
+    border-radius: 50px;
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-primary);
     font-size: 1.1em;
-    color: #555;
-    margin-top: 20px;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    backdrop-filter: blur(10px);
 }
 
-.ranking-list {
-    margin-top: 30px;
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
+.search-section input[type="text"]:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    /* Stronger, more distinct shadow */
+    box-shadow: 
+        0 0 30px var(--search-input-focus-shadow-color), 
+        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    transform: scale(1.02);
+    background: rgba(255, 255, 255, 0.15);
 }
 
+.search-section button {
+    padding: 15px 30px;
+    background: var(--gradient-primary);
+    color: white;
+    border: none;
+    border-radius: 50px;
+    font-size: 1.1em;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    box-shadow: 0 8px 20px rgba(29, 185, 84, 0.3);
+    position: relative;
+    overflow: hidden;
+}
+
+.search-section button::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.5s;
+}
+
+.search-section button:hover::before {
+    left: 100%;
+}
+
+.search-section button:hover {
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 12px 30px rgba(29, 185, 84, 0.5);
+}
+
+.search-section button:active {
+    transform: translateY(-1px) scale(1.02);
+}
+
+/* Enhanced Artist Items */
 .artist-item {
     display: flex;
     align-items: center;
-    background-color: #ecf0f1;
-    border-radius: 8px;
-    padding: 10px 15px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-    transition: transform 0.2s ease;
+    /* ***** ADJUSTED INITIAL BACKGROUND & TEXT COLOR FOR BETTER VISIBILITY ***** */
+    background: var(--artist-item-bg-initial); /* Less transparent to minimize background bleed */
+    border: 1px solid rgba(29, 185, 84, 0.2);
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 15px;
+    backdrop-filter: blur(10px);
+    
+    /* Consolidated Transition for smoothness */
+    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), 
+                box-shadow 0.4s ease-in-out, 
+                border-color 0.4s ease-in-out,
+                background 0.4s ease-in-out; 
+    
+    position: relative;
+    overflow: hidden;
+    opacity: 0; 
+    transform: translateX(-50px);
+}
+
+@keyframes artistSlideIn {
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.artist-item::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: var(--gradient-primary);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: -1;
 }
 
 .artist-item:hover {
-    transform: translateY(-3px);
+    transform: translateY(-8px) scale(1.02) rotateY(2deg); 
+    box-shadow: 
+        0 20px 40px rgba(29, 185, 84, 0.3),
+        0 0 30px rgba(255, 107, 53, 0.2);
+    border-color: var(--primary-color);
+    /* ***** MORE PRONOUNCED HOVER BACKGROUND ***** */
+    background: var(--artist-item-hover-bg); 
 }
 
-.artist-rank {
-    font-size: 1.2em;
-    font-weight: bold;
-    margin-right: 15px;
-    color: #3498db;
-    min-width: 30px; /* Ensure consistent spacing */
-    text-align: right;
+.artist-item:hover::before {
+    opacity: 0.1;
+}
+
+.rank-number {
+    font-size: 1.8em;
+    font-weight: 900;
+    background: var(--gradient-accent);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    min-width: 60px;
+    text-align: center;
+    margin-right: 20px;
+    animation: rankPulse 2s ease-in-out infinite alternate;
+}
+
+@keyframes rankPulse {
+    0% { transform: scale(1); }
+    100% { transform: scale(1.1); }
 }
 
 .artist-image {
-    width: 60px;
-    height: 60px;
-    border-radius: 50%; /* Make it circular */
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
     object-fit: cover;
-    margin-right: 15px;
-    border: 2px solid #ccc;
+    margin-right: 20px;
+    border: 3px solid rgba(29, 185, 84, 0.5);
+    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275),
+                border-color 0.4s ease,
+                box-shadow 0.4s ease;
+    box-shadow: 0 0 20px rgba(29, 185, 84, 0.3);
+}
+
+.artist-item:hover .artist-image {
+    transform: scale(1.1) rotate(5deg);
+    border-color: var(--accent-color);
+    box-shadow: 0 0 30px rgba(255, 107, 53, 0.5);
 }
 
 .artist-info {
@@ -82,179 +348,212 @@ p {
 }
 
 .artist-name {
-    font-size: 1.3em;
-    font-weight: bold;
-    color: #2c3e50;
-}
-
-.artist-followers {
-    font-size: 0.9em;
-    color: #7f8c8d;
-}
-
-/* Highlight for the top artist */
-.top-artist {
-    background-color: #fff9e6; /* Lighter yellow */
-    border: 2px solid #f39c12; /* Orange border */
-    transform: scale(1.02);
-}
-
-.top-artist .artist-name {
-    color: #e67e22; /* Darker orange */
-    font-size: 1.5em; /* Bigger writing */
-}
-
-.top-artist .artist-rank {
-    color: #d35400; /* Even darker orange */
     font-size: 1.4em;
+    font-weight: 700;
+    /* ***** ENSURING INITIAL TEXT IS LIGHTER FOR VISIBILITY ***** */
+    color: var(--artist-item-text); 
+    margin-bottom: 8px;
+    transition: color 0.3s ease, text-shadow 0.3s ease;
 }
 
-.top-artist .artist-image {
-    border-color: #e67e22;
+.artist-item:hover .artist-name {
+    /* ***** ENSURING HOVER TEXT IS WHITE FOR MAXIMUM CONTRAST ***** */
+    color: var(--artist-item-hover-text); 
+    text-shadow: 0 0 10px rgba(29, 185, 84, 0.5);
 }
 
-.error-message {
-    color: #c0392b;
-    background-color: #ffe6e6;
-    padding: 15px;
-    border-radius: 8px;
-    margin-top: 20px;
+.artist-info p {
+    color: var(--text-secondary);
+    margin: 5px 0;
+    font-size: 0.95em;
+    transition: color 0.3s ease, transform 0.3s ease;
+}
+
+.artist-item:hover .artist-info p {
+    /* ***** Making paragraph text clearly white on hover ***** */
+    color: var(--text-primary); 
+    transform: translateX(5px);
+}
+
+/* Loading Animation */
+.loading-message {
     text-align: center;
-    font-weight: bold;
+    font-size: 1.3em;
+    color: var(--text-secondary);
+    animation: loadingPulse 1.5s ease-in-out infinite alternate;
 }
 
-/* Basic spinner CSS */
+@keyframes loadingPulse {
+    0% { opacity: 0.6; transform: scale(1); }
+    100% { opacity: 1; transform: scale(1.05); }
+}
+
 .spinner {
     display: inline-block;
-    width: 1.2em;
-    height: 1.2em;
-    border: 2px solid rgba(0,0,0,.1);
+    width: 1.5em;
+    height: 1.5em;
+    border: 3px solid rgba(29, 185, 84, 0.3);
     border-radius: 50%;
-    border-top-color: #3498db; /* Your theme color */
-    animation: spin 1s ease-in-out infinite;
-    margin-left: 8px;
-    vertical-align: middle;
+    border-top-color: var(--primary-color);
+    animation: spin 1s linear infinite;
+    margin-left: 10px;
+    box-shadow: 0 0 15px rgba(29, 185, 84, 0.3);
 }
 
 @keyframes spin {
     to { transform: rotate(360deg); }
 }
 
-/* ... (existing styles) */
-
-/* NEW styles for search section */
-.search-section {
-    margin-bottom: 25px;
-    padding: 20px;
-    background-color: #282828;
-    border-radius: 8px;
-    display: flex;
-    flex-wrap: wrap; /* Allows input and button to wrap on smaller screens */
-    gap: 10px;
-    align-items: center;
-}
-
-.search-section input[type="text"] {
-    flex-grow: 1; /* Allows input to take available space */
-    padding: 10px 15px;
-    border: 1px solid #4a4a4a;
-    border-radius: 5px;
-    background-color: #333;
-    color: #fff;
-    font-size: 1em;
-}
-
-.search-section button {
-    padding: 10px 20px;
-    background-color: #1DB954; /* Spotify Green */
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 1em;
-    font-weight: bold;
-    transition: background-color 0.2s ease;
-}
-
-.search-section button:hover {
-    background-color: #1ed760;
-}
-
+/* Enhanced Search Results */
 .search-results-display {
-    width: 100%; /* Takes full width below input/button */
-    margin-top: 15px;
-    padding-top: 15px;
-    border-top: 1px solid #4a4a4a;
+    width: 100%;
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 2px solid rgba(29, 185, 84, 0.3);
+    position: relative;
 }
 
-.search-results-display .message {
-    text-align: center;
-    color: #bbb;
-    font-style: italic;
-}
-
-.search-results-display .error-message {
-    color: #ff6b6b;
-    font-weight: bold;
-}
-
-/* Style for the single artist result card */
 .searched-artist {
-    display: flex;
-    align-items: center;
-    background-color: #333;
-    padding: 15px;
-    border-radius: 8px;
-    margin-bottom: 15px; /* Add some space below if multiple searches */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    /* ***** CLEARLY DISTINCT SEARCHED ARTIST BACKGROUND ***** */
+    background: var(--searched-artist-bg);
+    border: 2px solid rgba(255, 107, 53, 0.4);
+    border-radius: 20px;
+    padding: 25px;
+    box-shadow: var(--shadow-accent);
+    animation: searchResultSlide 0.5s ease-out;
+    backdrop-filter: blur(15px);
+}
+
+@keyframes searchResultSlide {
+    from {
+        opacity: 0;
+        transform: translateY(30px) scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
 }
 
 .searched-artist .artist-image {
-    width: 80px;
-    height: 80px;
-    border-radius: 50%;
-    object-fit: cover;
-    margin-right: 15px;
+    width: 100px;
+    height: 100px;
+    border-color: var(--accent-color);
+    box-shadow: 0 0 25px rgba(255, 107, 53, 0.4);
 }
 
 .searched-artist .artist-info h3 {
-    margin-top: 0;
-    margin-bottom: 5px;
-    color: #1DB954;
+    background: var(--gradient-accent);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-size: 1.6em;
 }
 
-.searched-artist .artist-info p {
-    margin: 3px 0;
-    font-size: 0.9em;
-    color: #bbb;
+.rank-badge {
+    background: var(--gradient-primary) !important;
+    color: white !important;
+    padding: 8px 16px !important;
+    border-radius: 25px !important;
+    font-weight: 700 !important;
+    box-shadow: 0 4px 15px rgba(29, 185, 84, 0.4) !important;
+    animation: badgePulse 2s ease-in-out infinite alternate !important;
 }
 
-.searched-artist .rank-badge {
-    display: inline-block;
-    background-color: #1DB954;
-    color: white;
-    padding: 4px 8px;
-    border-radius: 4px;
-    font-size: 0.8em;
-    font-weight: bold;
-    margin-top: 5px;
+@keyframes badgePulse {
+    0% { transform: scale(1); box-shadow: 0 4px 15px rgba(29, 185, 84, 0.4); }
+    100% { transform: scale(1.05); box-shadow: 6px 20px rgba(29, 185, 84, 0.6); }
 }
 
-.searched-artist .not-ranked {
-    display: inline-block;
-    background-color: #555;
-    color: #eee;
-    padding: 4px 8px;
-    border-radius: 4px;
-    font-size: 0.8em;
-    font-weight: bold;
-    margin-top: 5px;
+.not-ranked {
+    background: linear-gradient(135deg, #666 0%, #999 100%) !important;
+    color: white !important;
+    padding: 8px 16px !important;
+    border-radius: 25px !important;
+    font-weight: 700 !important;
 }
 
-/* Optional: Highlight an artist in the main list if they are also searched */
-.artist-item.highlight-searched {
-    border: 2px solid #1DB954; /* Green border */
-    box-shadow: 0 0 15px rgba(29, 185, 84, 0.6); /* Green glow */
-    transform: scale(1.02); /* Slightly larger */
-    transition: all 0.3s ease-in-out;
+/* Highlight Effect */
+.highlight-searched {
+    border: 3px solid var(--accent-color) !important;
+    box-shadow: 
+        0 0 30px rgba(255, 107, 53, 0.6),
+        0 20px 40px rgba(255, 107, 53, 0.3) !important;
+    transform: scale(1.03) !important;
+    animation: highlightPulse 2s ease-in-out infinite alternate !important;
+}
+
+@keyframes highlightPulse {
+    0% { 
+        box-shadow: 
+            0 0 30px rgba(255, 107, 53, 0.6),
+            0 20px 40px rgba(255, 107, 53, 0.3);
+    }
+    100% { 
+        box-shadow: 
+            0 0 40px rgba(255, 107, 53, 0.8),
+            0 25px 50px rgba(255, 107, 53, 0.4);
+    }
+}
+
+/* Error Messages */
+.error-message {
+    background: linear-gradient(135deg, rgba(220, 53, 69, 0.3) 0%, rgba(220, 53, 69, 0.2) 100%); /* More opaque */
+    border: 2px solid rgba(220, 53, 69, 0.7); /* Stronger border */
+    color: #ff8888; /* Lighter red for text */
+    padding: 20px;
+    border-radius: 15px;
+    text-align: center;
+    font-weight: 600;
+    animation: errorShake 0.5s ease-in-out;
+    backdrop-filter: blur(10px);
+}
+
+@keyframes errorShake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-10px); }
+    75% { transform: translateX(10px); }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .container {
+        margin: 10px;
+        padding: 20px;
+        border-radius: 16px;
+    }
+    
+    h1 {
+        font-size: 2.5em;
+    }
+    
+    .search-section {
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    .artist-item {
+        padding: 15px;
+    }
+    
+    .artist-image {
+        width: 60px;
+        height: 60px;
+    }
+    
+    .rank-number {
+        font-size: 1.4em;
+        min-width: 40px;
+        margin-right: 15px;
+    }
+}
+
+/* Scroll animations */
+@media (prefers-reduced-motion: no-preference) {
+    .artist-item {
+        /* This applies the staggered animation delay for the initial fade-in/slide-in */
+        /* The '--animation-order' CSS variable is set by JavaScript */
+        animation-delay: calc(var(--animation-order, 0) * 0.1s);
+        animation-fill-mode: forwards; /* Ensures the animation stays at its 'to' state */
+    }
 }
