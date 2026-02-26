@@ -55,9 +55,12 @@ const SEARCH_QUERIES = [
     'pop', 'rock', 'hip hop', 'trap', 'reggae',
     'dance', 'country', 'band', 'legend', 'star'
 ];
-const SEARCH_LIMIT = 50;
-const SEARCH_OFFSETS = [0, 50, 100];
+// Spotify Development Mode: max limit is now 10 (reduced from 50)
+const SEARCH_LIMIT = 10;
+const SEARCH_OFFSETS = [0, 10, 20];
 const RANKING_SIZE = 100;
+// Maximum absolute position used for scoring (offset + index)
+const MAX_POSITION = Math.max(...SEARCH_OFFSETS) + SEARCH_LIMIT;
 
 let cachedRanking = null;
 let lastCacheTime = 0;
@@ -79,36 +82,38 @@ async function getArtistsRanking() {
             const url = `https://api.spotify.com/v1/search?q=${encodeURIComponent(query)}&type=artist&limit=${SEARCH_LIMIT}&offset=${offset}`;
             searchPromises.push(
                 axios.get(url, { headers })
-                    .then(res => res.data.artists.items || [])
-                    .catch(() => [])
+                    .then(res => ({ items: res.data.artists.items || [], offset }))
+                    .catch(() => ({ items: [], offset }))
             );
         }
     }
 
     const results = await Promise.all(searchPromises);
 
-    for (const group of results) {
-        for (const artist of group) {
-            if (
-                artist?.id &&
-                artist?.name &&
-                artist?.followers?.total &&
-                typeof artist.popularity === 'number' &&
-                artist?.images?.[0]?.url
-            ) {
-                allArtistsMap.set(artist.id, {
-                    id: artist.id,
-                    name: artist.name,
-                    followers: artist.followers.total,
-                    popularity: artist.popularity,
-                    imageUrl: artist.images[0].url
-                });
+    // Rank artists by search-result position score.
+    // popularity and followers are no longer available in Development Mode
+    // (removed per Spotify's February 2026 API changes).
+    for (const { items, offset } of results) {
+        items.forEach((artist, index) => {
+            if (artist?.id && artist?.name && artist?.images?.[0]?.url) {
+                // Artists appearing earlier in search results score higher
+                const positionScore = MAX_POSITION - (offset + index);
+                if (allArtistsMap.has(artist.id)) {
+                    allArtistsMap.get(artist.id).score += positionScore;
+                } else {
+                    allArtistsMap.set(artist.id, {
+                        id: artist.id,
+                        name: artist.name,
+                        imageUrl: artist.images[0].url,
+                        score: positionScore
+                    });
+                }
             }
-        }
+        });
     }
 
     const uniqueArtists = Array.from(allArtistsMap.values());
-    uniqueArtists.sort((a, b) => b.popularity - a.popularity);
+    uniqueArtists.sort((a, b) => b.score - a.score);
 
     cachedRanking = uniqueArtists.slice(0, RANKING_SIZE);
     lastCacheTime = Date.now();
@@ -153,8 +158,6 @@ app.get('/api/search-artist', async (req, res) => {
         res.json({
             id: artist.id,
             name: artist.name,
-            popularity: artist.popularity ?? 0,
-            followers: artist.followers?.total ?? 0,
             imageUrl: artist.images?.[0]?.url || 'https://via.placeholder.com/150',
             rankInTop100: rank > 0 ? rank : -1
         });

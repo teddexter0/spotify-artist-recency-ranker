@@ -59,8 +59,6 @@ export default async function handler(req, res) {
     res.json({
       id: artist.id,
       name: artist.name,
-      popularity: artist.popularity ?? 0,
-      followers: artist.followers?.total ?? 0,
       imageUrl: artist.images?.[0]?.url || 'https://via.placeholder.com/150',
       rankInTop100: -1 // Let frontend compare with list if needed
     });
