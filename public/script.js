@@ -207,8 +207,6 @@ function displayArtists(artists) {
             <img src="${artist.imageUrl}" alt="${artist.name}" class="artist-image" loading="lazy">
             <div class="artist-info">
                 <h3 class="artist-name">${artist.name}</h3>
-                <p>Popularity: <strong style="color: var(--primary-color);">${artist.popularity}/100</strong></p>
-                <p>Followers: <strong style="color: var(--accent-color);">${artist.followers.toLocaleString()}</strong></p>
             </div>
         `;
         
@@ -320,8 +318,6 @@ async function searchArtist() {
                 <img src="${artist.imageUrl}" alt="${artist.name}" class="artist-image">
                 <div class="artist-info">
                     <h3 class="artist-name">${artist.name}</h3>
-                    <p>Popularity: <strong style="color: var(--primary-color);">${artist.popularity}/100</strong></p>
-                    <p>Followers: <strong style="color: var(--accent-color);">${artist.followers.toLocaleString()}</strong></p>
                     ${rankText}
                 </div>
             `;
