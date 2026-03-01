@@ -143,23 +143,43 @@ app.get('/api/search-artist', async (req, res) => {
     try {
         const token = await getSpotifyAccessToken();
 
-        const searchRes = await fetch(`https://api.spotify.com/v1/search?q=${encodeURIComponent(name)}&type=artist&limit=1`, {
+        const searchRes = await fetch(`https://api.spotify.com/v1/search?q=${encodeURIComponent(name)}&type=artist&limit=5`, {
             headers: { Authorization: `Bearer ${token}` }
         });
 
         const json = await searchRes.json();
-        const artist = json.artists?.items?.[0];
+        const candidates = json.artists?.items || [];
 
-        if (!artist) return res.status(404).json({ message: 'Artist not found' });
+        if (!candidates.length) return res.status(404).json({ message: 'Artist not found' });
 
         const topArtists = await getArtistsRanking();
-        const rank = topArtists.findIndex(a => a.id === artist.id) + 1;
+
+        // Pick the highest-ranked candidate among the search results (by Spotify ID)
+        let bestArtist = candidates[0];
+        let bestRank = Infinity;
+
+        for (const candidate of candidates) {
+            if (!candidate?.id) continue;
+            const rankIdx = topArtists.findIndex(a => a.id === candidate.id);
+            if (rankIdx !== -1 && rankIdx + 1 < bestRank) {
+                bestArtist = candidate;
+                bestRank = rankIdx + 1;
+            }
+        }
+
+        // Fallback: case-insensitive name match in ranking (handles duplicate artist profiles)
+        if (bestRank === Infinity) {
+            const nameIdx = topArtists.findIndex(
+                a => a.name.toLowerCase() === candidates[0].name.toLowerCase()
+            );
+            if (nameIdx !== -1) bestRank = nameIdx + 1;
+        }
 
         res.json({
-            id: artist.id,
-            name: artist.name,
-            imageUrl: artist.images?.[0]?.url || 'https://via.placeholder.com/150',
-            rankInTop100: rank > 0 ? rank : -1
+            id: bestArtist.id,
+            name: bestArtist.name,
+            imageUrl: bestArtist.images?.[0]?.url || 'https://via.placeholder.com/150',
+            rankInTop100: bestRank < Infinity ? bestRank : -1
         });
     } catch (err) {
         console.error('❌ Search API Error:', err);
