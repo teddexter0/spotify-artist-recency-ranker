@@ -300,7 +300,7 @@ async function searchArtist() {
             artistCard.className = 'artist-item searched-artist'; // Use existing styling + new class
 
             let rankText = '';
-            if (artist.rankInTop100 && artist.rankInTop100 !== -1) { // Check for truthiness and -1
+            if (artist.rankInTop100 > 0) {
                 rankText = `<span class="rank-badge">Rank #${artist.rankInTop100}</span>`;
 
                 // Highlight the artist in the main list if found
